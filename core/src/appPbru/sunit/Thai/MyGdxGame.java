@@ -9,21 +9,29 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.TimeUtils;
+
+import java.util.Iterator;
 
 public class MyGdxGame extends ApplicationAdapter {
 
 	//Explicit
 	private SpriteBatch batch;
-	private Texture wallpaperTexture, cloudTexture, pigTexture;
+	private Texture wallpaperTexture, cloudTexture, pigTexture, coinsTexture;
 	private OrthographicCamera objOrthographicCamera; //ปรับ scale ให้ตามขนาดจอ
 	private BitmapFont nameBitmapFont;
 	private int xCloundAnInt, yCloundAnInt = 600;
 	private boolean cloundABoolean = true;
-	private Rectangle pigRectangle;
+	private Rectangle pigRectangle,coinsRectangle;
 	private Vector3 objVector3;
 	private Sound pigSound;
+	private Array<Rectangle> coinsArray;
+	private long lastDropCoins;
+	private Iterator<Rectangle> coinIterator; // ==> Java.util
 
 
 	@Override
@@ -56,8 +64,27 @@ public class MyGdxGame extends ApplicationAdapter {
 
 		//setup pig sound
 		pigSound = Gdx.audio.newSound(Gdx.files.internal("pig.wav"));
+		//setup coins
+		coinsTexture = new Texture(("coins.png"));
+
+		//Create coinsArray
+		coinsArray = new Array<Rectangle>();
+		coinsRandomDrop();
+
 
 	}  //create เอาไว้กำหนดค่า
+
+	private void coinsRandomDrop() {
+
+		coinsRectangle = new Rectangle();
+		coinsRectangle.x = MathUtils.random(0, 1136);
+		coinsRectangle.y = 800;
+		coinsRectangle.width = 64;
+		coinsRectangle.height = 64;
+		coinsArray.add(coinsRectangle);
+		lastDropCoins = TimeUtils.nanoTime(); //ถ้า randomได้เลขเดียวกันไม่เอา
+
+	}
 
 	@Override
 	public void render() {
