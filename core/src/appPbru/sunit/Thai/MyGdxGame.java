@@ -109,6 +109,11 @@ public class MyGdxGame extends ApplicationAdapter {
 		//Drawable pig
 		batch.draw(pigTexture, pigRectangle.x, pigRectangle.y);
 
+		//drawable coins
+		for (Rectangle forCoins : coinsArray) {
+			batch.draw(coinsTexture, forCoins.x, forCoins.y);
+		}
+
 		batch.end();
 
 		//Move clound
@@ -119,6 +124,8 @@ public class MyGdxGame extends ApplicationAdapter {
 
 		//random Drop Coins
 		randomDropCoins();
+
+
 
 	}    //render ไว้วนลูป
 
@@ -136,6 +143,13 @@ public class MyGdxGame extends ApplicationAdapter {
 			Rectangle myConsRectangle = coinsIterator.next();
 			myConsRectangle.y -= 50 * Gdx.graphics.getDeltaTime();
 
+			//When Coins into Floor clear coins
+			if (myConsRectangle.y + 64 < 0) {
+
+				coinsIterator.remove();
+
+
+			}
 
 
 
