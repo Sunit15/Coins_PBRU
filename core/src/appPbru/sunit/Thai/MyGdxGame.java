@@ -2,6 +2,7 @@ package appPbru.sunit.Thai;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -24,16 +25,17 @@ public class MyGdxGame extends ApplicationAdapter {
 	private Texture wallpaperTexture, cloudTexture,
 			pigTexture, coinsTexture, rainTexture;
 	private OrthographicCamera objOrthographicCamera; //ปรับ scale ให้ตามขนาดจอ
-	private BitmapFont nameBitmapFont, scoreBitmapFont;
+	private BitmapFont nameBitmapFont, scoreBitmapFont, showScoreBitmapFont;
 	private int xCloundAnInt, yCloundAnInt = 600;
-	private boolean cloundABoolean = true;
+	private boolean cloundABoolean = true, finishABoolean = false;
 	private Rectangle pigRectangle,coinsRectangle, rainRectangle;
 	private Vector3 objVector3;
 	private Sound pigSound, waterDropSound, coinsDropSound;
 	private Array<Rectangle> coinsArray, rainArray;
 	private long lastDropCoins,lastDropRain;
 	private Iterator<Rectangle> coinsIterator, rainIterator; // ==> Java.util
-	private int scoreAnInt = 0;  //คะแนนเริ่มต้น
+	private int scoreAnInt = 0, falseAnInt = 0, finalScoreAnInt;  //คะแนนเริ่มต้น
+	private Music rainMusic, backgroundMusic;
 
 
 	@Override
@@ -89,6 +91,17 @@ public class MyGdxGame extends ApplicationAdapter {
 		rainArray = new Array<Rectangle>();
 		rainRandomDrop();
 
+		//setup rain music
+		rainMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
+
+		//setup background
+		backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("bggame.mp3"));
+
+		//setup ShowScore
+		showScoreBitmapFont = new BitmapFont();
+		showScoreBitmapFont.setColor(230, 28, 223, 255);
+		showScoreBitmapFont.setScale(5);
+
 	}  //create เอาไว้กำหนดค่า
 
 	private void rainRandomDrop() {
@@ -134,7 +147,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		batch.draw(cloudTexture, xCloundAnInt,yCloundAnInt);
 
 		//DrawableBitMapFont
-		nameBitmapFont.draw(batch, "Coins PBRU", 50, 600);
+		nameBitmapFont.draw(batch, "Coins PBRU", 50, 750);
 
 		//Drawable pig
 		batch.draw(pigTexture, pigRectangle.x, pigRectangle.y);
@@ -152,6 +165,13 @@ public class MyGdxGame extends ApplicationAdapter {
 			batch.draw(rainTexture, forRain.x, forRain.y);
 		}
 
+		if (finishABoolean) {
+
+			batch.draw(wallpaperTexture, 0, 0);
+			showScoreBitmapFont.draw(batch, "Your score ==> " + Integer.toString(finalScoreAnInt), 500, 750);
+
+		}
+
 		batch.end();
 
 		//Move clound
@@ -166,7 +186,11 @@ public class MyGdxGame extends ApplicationAdapter {
 		//random Drop Rain
 		randomDropRain();
 
+		//play rain music
+		rainMusic.play();
 
+		//play background music
+		backgroundMusic.play();
 
 	}    //render ไว้วนลูป
 
@@ -219,8 +243,10 @@ public class MyGdxGame extends ApplicationAdapter {
 
 			//When Coins into Floor clear coins
 			if (myConsRectangle.y + 64 < 0) {
+				falseAnInt += 1;
 				waterDropSound.play(); //เหรียญโดนพื้นแล้วดัง
 				coinsIterator.remove();
+				checkFalse();
 			}	//if
 
 			//When Coins Overlap Pig
@@ -234,6 +260,34 @@ public class MyGdxGame extends ApplicationAdapter {
 		}	//while loop
 
 	}	//randomDropCoins
+
+	private void checkFalse() {
+
+		if (falseAnInt > 20) {
+			dispose();
+
+			if (!finishABoolean) {
+				finalScoreAnInt = scoreAnInt;
+
+				finishABoolean = true;
+
+			}
+
+		}//if
+
+	}//checkFalse
+
+	@Override
+	public void dispose() {
+		super.dispose();
+
+		backgroundMusic.dispose();  //ให้เสียงเพลงหยุด
+		rainMusic.dispose();
+		pigSound.dispose();
+		waterDropSound.dispose();
+		coinsDropSound.dispose();
+
+	}//dispose
 
 	private void activeTouchScreen() {
 		//ถ้านิ้วโดนจอ ทำงาน
