@@ -31,7 +31,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	private Sound pigSound;
 	private Array<Rectangle> coinsArray;
 	private long lastDropCoins;
-	private Iterator<Rectangle> coinIterator; // ==> Java.util
+	private Iterator<Rectangle> coinsIterator; // ==> Java.util
 
 
 	@Override
@@ -117,7 +117,31 @@ public class MyGdxGame extends ApplicationAdapter {
 		//Active When Touch Screen
 		activeTouchScreen();
 
+		//random Drop Coins
+		randomDropCoins();
+
 	}    //render ไว้วนลูป
+
+	private void randomDropCoins() {
+
+		if (TimeUtils.nanoTime() - lastDropCoins > 1E9) {
+
+			coinsRandomDrop();
+
+		}
+
+		coinsIterator = coinsArray.iterator();
+		while (coinsIterator.hasNext()) {
+
+			Rectangle myConsRectangle = coinsIterator.next();
+			myConsRectangle.y -= 50 * Gdx.graphics.getDeltaTime();
+
+
+
+
+		}
+
+	}	//randomDropCoins
 
 	private void activeTouchScreen() {
 		//ถ้านิ้วโดนจอ ทำงาน
