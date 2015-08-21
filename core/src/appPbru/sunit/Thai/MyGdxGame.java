@@ -28,7 +28,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	private boolean cloundABoolean = true;
 	private Rectangle pigRectangle,coinsRectangle;
 	private Vector3 objVector3;
-	private Sound pigSound;
+	private Sound pigSound, waterDropSound, coinsDropSound;
 	private Array<Rectangle> coinsArray;
 	private long lastDropCoins;
 	private Iterator<Rectangle> coinsIterator; // ==> Java.util
@@ -42,7 +42,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		objOrthographicCamera = new OrthographicCamera();
 		objOrthographicCamera.setToOrtho(false, 1200, 800);
 		//setup wallpaper
-		wallpaperTexture = new Texture("wallpapers_a_02.png");
+		wallpaperTexture = new Texture("wallpapers_a_05.png");
 
 		//Setup BitMapFont
 		nameBitmapFont = new BitmapFont();
@@ -59,8 +59,8 @@ public class MyGdxGame extends ApplicationAdapter {
 		// ตำแหน่งเริ่มต้นของหมู
 		pigRectangle.x = 568;
 		pigRectangle.y = 100;
-		pigRectangle.width = 64;
-		pigRectangle.height = 64;
+		pigRectangle.width = 70; //64
+		pigRectangle.height = 70;
 
 		//setup pig sound
 		pigSound = Gdx.audio.newSound(Gdx.files.internal("pig.wav"));
@@ -71,6 +71,10 @@ public class MyGdxGame extends ApplicationAdapter {
 		coinsArray = new Array<Rectangle>();
 		coinsRandomDrop();
 
+		//Setup WaterDrop
+		waterDropSound = Gdx.audio.newSound(Gdx.files.internal("water_drop.wav"));
+		//setup coin dound
+		coinsDropSound = Gdx.audio.newSound(Gdx.files.internal("dog.wav"));
 
 	}  //create เอาไว้กำหนดค่า
 
@@ -145,15 +149,19 @@ public class MyGdxGame extends ApplicationAdapter {
 
 			//When Coins into Floor clear coins
 			if (myConsRectangle.y + 64 < 0) {
+				waterDropSound.play(); //เหรียญโดนพื้นแล้วดัง
+				coinsIterator.remove();
+			}	//if
 
+			//When Coins Overlap Pig
+			if (myConsRectangle.overlaps(pigRectangle)) {
+				coinsDropSound.play();
 				coinsIterator.remove();
 
 
-			}
+			}	//if
 
-
-
-		}
+		}	//while loop
 
 	}	//randomDropCoins
 
@@ -167,7 +175,8 @@ public class MyGdxGame extends ApplicationAdapter {
 			objVector3 = new Vector3();
 			objVector3.set(Gdx.input.getX(), Gdx.input.getY(), 0);
 
-			if (objVector3.x < 600) {
+			//if (objVector3.x < 600) {
+			if (objVector3.x < Gdx.graphics.getWidth()/2) {
 				if (pigRectangle.x < 0) {
 					pigRectangle.x = 0;
 				} else {
